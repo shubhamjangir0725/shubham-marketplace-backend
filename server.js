@@ -12,6 +12,7 @@ mongoose.connect("mongodb+srv://shubhamadmin:Shubham122333@cluster0.qzdk6sv.mong
 .then(() => console.log("Database Connected"))
 .catch(err => console.log(err));
 
+
 // User Schema
 const UserSchema = new mongoose.Schema({
     name: String,
@@ -20,10 +21,7 @@ const UserSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    password: {
-        type: String,
-        required: true
-    },
+    password: String,
     location: String
 });
 
@@ -35,16 +33,21 @@ const User = mongoose.model("User", UserSchema);
 // =========================
 app.post("/signup", async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { name, email, password, location } = req.body;
 
-        // Check if user already exists
         const existingUser = await User.findOne({ email });
+
         if (existingUser) {
             return res.status(400).json({ message: "User already exists" });
         }
 
-        // Create new user
-        const newUser = new User({ email, password });
+        const newUser = new User({
+            name,
+            email,
+            password,
+            location
+        });
+
         await newUser.save();
 
         res.status(201).json({ message: "User Registered Successfully" });
@@ -86,8 +89,9 @@ app.get("/", (req, res) => {
 });
 
 
+// Server Start
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    console.log(`Server Running on port ${PORT}`);
+    console.log("Server Running on port", PORT);
 });
